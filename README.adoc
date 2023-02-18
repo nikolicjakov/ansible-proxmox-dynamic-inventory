@@ -1,0 +1,49 @@
+= AWX Proxmox Dynamic Inventory
+
+This project provides a dynamic inventory script for Ansible AWX that can be used to fetch information about virtual machines in a Proxmox environment.
+
+== Requirements
+
+=== Proxmox QEMU Guest Agent requirement
+
+In order to be able to find the IP addresses of your virtual machines in a Proxmox environment, the Proxmox QEMU Guest Agent needs to be running on each virtual machine.
+
+The Proxmox QEMU Guest Agent is a small daemon that runs inside the virtual machine and provides various information and functionality to the Proxmox host. One of the main features of the agent is the ability to report the IP address of the virtual machine back to the Proxmox host, which is essential for dynamic inventory management.
+
+Please make sure that the Proxmox QEMU Guest Agent is installed and running on all virtual machines in your Proxmox environment.
+
+To install the QEMU Guest Agent, you can follow the official documentation at: https://pve.proxmox.com/wiki/Qemu-guest-agent.
+
+=== Python requirements
+
+To use this dynamic inventory script, you will need:
+
+* Python 3
+* `proxmoxer` library (`pip install proxmoxer`)
+* `json` library (`pip install json`)
+* `yaml` library (`pip install pyyaml`)
+
+To install all required packages you can execute `pip install -r requirements.txt`
+
+== Usage
+
+Since Ansible AWX does not support running custom script you would need to execute `update_hosts.py` with automation server or via CRON (i am using GitLab CI on inventory project). Configure it with your Proxmox API credentials and other settings. You can then run the script to generate YAML file `hosts` that can be used as inventory in AWX.
+
+To run the script, simply execute the following command:
+
+```
+python update_hosts.py
+```
+
+This will connect to your Proxmox environment and fetch the necessary information about your virtual machines, and then generate the JSON and YAML files that can be used as a dynamic inventory in AWX.
+
+== Configuration
+
+The `update_hosts.py` script can be configured using environment variables. The following environment variables are available:
+
+* `PROXMOX_URL`: The URL of your Proxmox API server (default: `proxmox.example.com`)
+* `PROXMOX_USER`: The username to use when authenticating with the Proxmox API (default: `root@pam`)
+* `PROXMOX_PASSWORD`: The password to use when authenticating with the Proxmox API (default: `changeme`)
+* `PROXMOX_NODES`: A comma-separated list of Proxmox nodes to query (default: `node1,node2,node3`)
+* `IP_PREFIX`: A string that the IP address must start with to be considered a valid match (default: `192.168.`)
+
